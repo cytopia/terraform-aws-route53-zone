@@ -133,23 +133,25 @@ resource "aws_route53_zone" "undelegated_public_subdomains" {
 resource "aws_route53_record" "name_delegated_subdomains_ns_default" {
   count = "${local.is_name_delegated && !local.is_custom_ns ? length(local.public_subdomains) : 0}"
 
-  zone_id = "${aws_route53_zone.name_delegated_public_subdomains.*.zone_id[count.index]}"
-  name    = "${local.public_subdomains[count.index]}"
-  type    = "NS"
-  ttl     = "${var.default_subdomain_ns_ttl}"
+  allow_overwrite = true
+  zone_id         = "${aws_route53_zone.name_delegated_public_subdomains.*.zone_id[count.index]}"
+  name            = "${local.public_subdomains[count.index]}"
+  type            = "NS"
+  ttl             = "${var.default_subdomain_ns_ttl}"
 
-  records = ["${aws_route53_zone.name_delegated_public_subdomains.*.name_servers[count.index]}"]
+  records         = ["${aws_route53_zone.name_delegated_public_subdomains.*.name_servers[count.index]}"]
 }
 
 resource "aws_route53_record" "name_delegated_subdomains_ns_custom" {
   count = "${local.is_name_delegated && local.is_custom_ns ? length(local.public_subdomains) : 0}"
 
-  zone_id = "${aws_route53_zone.name_delegated_public_subdomains.*.zone_id[count.index]}"
-  name    = "${local.public_subdomains[count.index]}"
-  type    = "NS"
-  ttl     = "${var.default_subdomain_ns_ttl}"
+  allow_overwrite = true
+  zone_id         = "${aws_route53_zone.name_delegated_public_subdomains.*.zone_id[count.index]}"
+  name            = "${local.public_subdomains[count.index]}"
+  type            = "NS"
+  ttl             = "${var.default_subdomain_ns_ttl}"
 
-  records = "${var.custom_subdomain_ns}"
+  records         = "${var.custom_subdomain_ns}"
 }
 
 # -------------------------------------------------------------------------------------------------
@@ -158,23 +160,25 @@ resource "aws_route53_record" "name_delegated_subdomains_ns_custom" {
 resource "aws_route53_record" "id_delegated_subdomains_ns_default" {
   count = "${local.is_id_delegated && !local.is_custom_ns ? length(local.public_subdomains) : 0}"
 
-  zone_id = "${aws_route53_zone.id_delegated_public_subdomains.*.zone_id[count.index]}"
-  name    = "${local.public_subdomains[count.index]}"
-  type    = "NS"
-  ttl     = "${var.default_subdomain_ns_ttl}"
+  allow_overwrite = true
+  zone_id         = "${aws_route53_zone.id_delegated_public_subdomains.*.zone_id[count.index]}"
+  name            = "${local.public_subdomains[count.index]}"
+  type            = "NS"
+  ttl             = "${var.default_subdomain_ns_ttl}"
 
-  records = ["${aws_route53_zone.id_delegated_public_subdomains.*.name_servers[count.index]}"]
+  records         = ["${aws_route53_zone.id_delegated_public_subdomains.*.name_servers[count.index]}"]
 }
 
 resource "aws_route53_record" "id_delegated_subdomains_ns_custom" {
   count = "${local.is_id_delegated && local.is_custom_ns ? length(local.public_subdomains) : 0}"
 
-  zone_id = "${aws_route53_zone.id_delegated_public_subdomains.*.zone_id[count.index]}"
-  name    = "${local.public_subdomains[count.index]}"
-  type    = "NS"
-  ttl     = "${var.default_subdomain_ns_ttl}"
+  allow_overwrite = true
+  zone_id         = "${aws_route53_zone.id_delegated_public_subdomains.*.zone_id[count.index]}"
+  name            = "${local.public_subdomains[count.index]}"
+  type            = "NS"
+  ttl             = "${var.default_subdomain_ns_ttl}"
 
-  records = "${var.custom_subdomain_ns}"
+  records         = "${var.custom_subdomain_ns}"
 }
 
 # -------------------------------------------------------------------------------------------------
@@ -183,21 +187,23 @@ resource "aws_route53_record" "id_delegated_subdomains_ns_custom" {
 resource "aws_route53_record" "undelegated_subdomains_ns_default" {
   count = "${local.is_undelegated && !local.is_custom_ns ? length(local.public_subdomains) : 0}"
 
-  zone_id = "${aws_route53_zone.undelegated_public_subdomains.*.zone_id[count.index]}"
-  name    = "${local.public_subdomains[count.index]}"
-  type    = "NS"
-  ttl     = "${var.default_subdomain_ns_ttl}"
+  allow_overwrite = true
+  zone_id         = "${aws_route53_zone.undelegated_public_subdomains.*.zone_id[count.index]}"
+  name            = "${local.public_subdomains[count.index]}"
+  type            = "NS"
+  ttl             = "${var.default_subdomain_ns_ttl}"
 
-  records = ["${aws_route53_zone.undelegated_public_subdomains.*.name_servers[count.index]}"]
+  records         = ["${aws_route53_zone.undelegated_public_subdomains.*.name_servers[count.index]}"]
 }
 
 resource "aws_route53_record" "undelegated_subdomains_ns_custom" {
   count = "${local.is_undelegated && local.is_custom_ns ? length(local.public_subdomains) : 0}"
 
-  zone_id = "${aws_route53_zone.undelegated_public_subdomains.*.zone_id[count.index]}"
-  name    = "${local.public_subdomains[count.index]}"
-  type    = "NS"
-  ttl     = "${var.default_subdomain_ns_ttl}"
+  allow_overwrite = true
+  zone_id         = "${aws_route53_zone.undelegated_public_subdomains.*.zone_id[count.index]}"
+  name            = "${local.public_subdomains[count.index]}"
+  type            = "NS"
+  ttl             = "${var.default_subdomain_ns_ttl}"
 
-  records = "${var.custom_subdomain_ns}"
+  records         = "${var.custom_subdomain_ns}"
 }
