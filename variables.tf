@@ -1,43 +1,41 @@
 # -------------------------------------------------------------------------------------------------
-# Hosted Zone definitions
+# Optional Variables
 # -------------------------------------------------------------------------------------------------
-variable "public_hosted_zones" {
-  description = "List of domains or subdomains for which to create public hosted zones."
-  type        = "list"
+variable "delegation_sets" {
+  type        = list(string)
   default     = []
+  description = "A set of four authoritative name servers that you can use with more than one hosted zone. By default, Route 53 assigns a random selection of name servers to each new hosted zone. To make it easier to migrate DNS service to Route 53 for a large number of domains, you can create a reusable delegation set and then associate the reusable delegation set with new hosted zones."
 }
 
-variable "delegation_set_name" {
-  description = "Create a shared delegation set among specefied hosted zones domains if not empty. (nmutually exclusive to 'delegation_set_id')."
-  default     = ""
-}
-
-variable "delegation_set_id" {
-  description = "Assign specified hosted zones to a delegation set specified by ID if not empty. (mutually exclusive to 'delegation_set_reference_name')."
-  default     = ""
-}
-
-variable "custom_subdomain_ns" {
-  description = "Hosted zones for subdomains require nameserver to be specified explicitly. You can use this variable to add a list of custom nameserver IP addresses. If left empty it will be populated by four AWS default nameserver."
-  type        = "list"
+variable "public_root_zones" {
+  type = list(object({
+    name           = string,
+    delegation_set = string,
+  }))
   default     = []
+  description = "Route53 root zone (also allows subdomain if this is your root starting point). Set delegation_set to 'null' to use no delegation set."
 }
 
-variable "default_subdomain_ns_ttl" {
-  description = "Hosted zones for subdomains require nameserver to be specified explicitly. This sets their default TTL."
-  default     = "30"
+variable "public_subdomain_zones" {
+  type = list(object({
+    name           = string,
+    root           = string,
+    ns_ttl         = number,
+    nameservers    = list(string),
+    delegation_set = string,
+  }))
+  default     = []
+  description = "Route53 subdomain zone (root zone must be specified as well). Set delegation_set to 'null' to use no delegation set."
 }
 
-# -------------------------------------------------------------------------------------------------
-# Resource Tagging/Naming
-# -------------------------------------------------------------------------------------------------
 variable "tags" {
-  description = "The resource tags that should be added to all hosted zone resources."
-  type        = "map"
+  type        = map
   default     = {}
+  description = "Default tags to additionally apply to all resources."
 }
 
 variable "comment" {
-  description = "The hosted zone comment that should be added to all hosted zone resources."
+  type        = string
   default     = "Managed by Terraform"
+  description = "Default comment to add to all resources."
 }
