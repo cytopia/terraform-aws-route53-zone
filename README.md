@@ -6,26 +6,51 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This Terraform module creates hosted zones for domains and subdomains. All specified hosted zones
-can be created without any delegation, with an already existing delegation set or by creating a
-new delegation set for all specified (sub)domains.
-
-This module is also be able to automatically distinguish between domains and subdomains. Subdomains
-require additional nameserver records to be set after creating the zone. Custom nameserver can be
-supplied via input variables or if left empty, AWS default nameserver will be assigned.
+can be created with or without a delegation set. NS records for sub zones are added automatically.
 
 
 ## Usage
 
 ```hcl
 module "public_zone" {
-  source = "github.com/cytopia/terraform-aws-route53-zone?ref=v0.1.0"
+  source = "github.com/cytopia/terraform-aws-route53-zone?ref=v1.0.0"
 
-  public_hosted_zones = "[
-    "example.com",
-    "example.org",
+  # Create as many delegation sets as are required
+  delegation_sets = [
+    "root-zone",
+    "sub-zone",
   ]
 
-  delegation_set_name = "root-domains"
+  # If delegation set is null, it will use AWS defaults.
+  public_root_zones = [
+    {
+      name           = "example.com",
+      delegation_set = "root-zones",
+    },
+    {
+      name           = "example.org",
+      delegation_set = null,
+    },
+  ]
+
+  # If delegation set is null, it will use AWS defaults.
+  # Specify your own nameserver or use an empty list to use AWS defaults.
+  public_subdomain_zones = [
+    {
+      name           = "internal.example.org",
+      root           = "example.org",
+      ns_ttl         = 30,
+      nameservers    = [],
+      delegation_set = null,
+    },
+    {
+      name           = "private.example.org",
+      root           = "example.org",
+      ns_ttl         = 30,
+      nameservers    = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
+      delegation_set = "sub-zone",
+    },
+  ]
 
   tags = {
     Environment    = "prod"
@@ -43,36 +68,40 @@ module "public_zone" {
 
 * [public-domains](examples/public-domains)
 * [public-subdomains](examples/public-subdomains)
-* [public-domains-and-subdomains](examples/public-domains-and-subdomains)
 
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| aws | n/a |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|:----:|:-----:|:-----:|
-| public\_hosted\_zones | List of domains or subdomains for which to create public hosted zones. | list | `<list>` | no |
-| delegation\_set\_name | Create a shared delegation set among specefied hosted zones domains if not empty. (nmutually exclusive to 'delegation_set_id'). | string | `""` | no |
-| delegation\_set\_id | Assign specified hosted zones to a delegation set specified by ID if not empty. (mutually exclusive to 'delegation_set_reference_name'). | string | `""` | no |
-| custom\_subdomain\_ns | Hosted zones for subdomains require nameserver to be specified explicitly. You can use this variable to add a list of custom nameserver IP addresses. If left empty it will be populated by four AWS default nameserver. | list | `<list>` | no |
-| default\_subdomain\_ns\_ttl | Hosted zones for subdomains require nameserver to be specified explicitly. This sets their default TTL. | string | `"30"` | no |
-| tags | The resource tags that should be added to all hosted zone resources. | map | `<map>` | no |
-| comment | The hosted zone comment that should be added to all hosted zone resources. | string | `"Managed by Terraform"` | no |
-
+|------|-------------|------|---------|:--------:|
+| comment | Default comment to add to all resources. | `string` | `"Managed by Terraform"` | no |
+| delegation\_sets | A set of four authoritative name servers that you can use with more than one hosted zone. By default, Route 53 assigns a random selection of name servers to each new hosted zone. To make it easier to migrate DNS service to Route 53 for a large number of domains, you can create a reusable delegation set and then associate the reusable delegation set with new hosted zones. | `list(string)` | `[]` | no |
+| public\_root\_zones | Route53 root zone (also allows subdomain if this is your root starting point). Set delegation\_set to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
+| public\_subdomain\_zones | Route53 subdomain zone (root zone must be specified as well). Set delegation\_set to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    root           = string,<br>    ns_ttl         = number,<br>    nameservers    = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
+| tags | Default tags to additionally apply to all resources. | `map` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| created\_delegation\_set\_id | The ID of the shared delegation set applied to all zones that has been created by this module if it was specified by name. |
-| created\_delegation\_set\_name | The name of the shared delegation set applied to all zones that has been created by this module if it was specified by name. |
-| created\_delegation\_set\_name\_servers | A list of name servers of the shared delegation set applied to all zones that has been created by this module if it was specified by name. |
-| existing\_delegation\_set\_id | The ID of the shared delegation set applied to all zones that alreday existed and was specified by its ID. |
-| existing\_delegation\_set\_name | The name of the shared delegation set applied to all zones that alreday existed and was specified by its ID. |
-| existing\_delegation\_set\_name\_servers | A list of name servers of the shared delegation set applied to all zones that alreday existed and was specified by its ID. |
-| public\_zones\_delegation\_set\_id | The ID of the shared delegation set applied to all zones that is actually used by the zones. |
-| public\_zones | List of created public zones. |
-| public\_zones\_ids | List of zone-id mappings for created public zones. |
+| delegation\_sets | Created delegation sets. |
+| public\_root\_zones | Created public root zones. |
+| public\_subdomain\_custom\_ns\_records | Created public subdomain default ns records. |
+| public\_subdomain\_default\_ns\_records | Created public subdomain default ns records. |
+| public\_subdomain\_zones | Created public subdomain zones. |
 
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Example output
 
@@ -82,30 +111,92 @@ $ terraform output
 ```
 Outputs:
 
-created_delegation_set_id = ABCDEFGHIJKL
-created_delegation_set_name = root-domains
-created_delegation_set_name_servers = [
-    ns-www.awsdns-00.org,
-    ns-xxx.awsdns-11.co.uk,
-    ns-yyy.awsdns-22.com,
-    ns-zzz.awsdns-33.net
-]
-existing_delegation_set_id =
-existing_delegation_set_name =
-existing_delegation_set_name_servers = []
-public_zones = [
-    example.com.,
-    example.org.
-]
-public_zones_delegation_set_id = ABCDEFGHIJKL
-public_zones_ids = [
-    {"example.com.": "ABCDEFGHIJKL"},
-    {"example.org.": "ABCDEFGHIJKL"}
-]
-public_zones_name_servers = [
-    {"example.com.": "ns-www.awsdns-00.org,ns-xxx.awsdns-11.co.uk,ns-yy.awsdns-22.com,ns-zzz.awsdns-22.net"},
-    {"example.org.": "ns-www.awsdns-00.org,ns-xxx.awsdns-11.co.uk,ns-yy.awsdns-22.com,ns-zzz.awsdns-22.net"}
-]
+delegation_sets = {
+  "dg0" = {
+    "id" = "N0XXXXXXXXXXXXXXXXXXX"
+    "name_servers" = [
+      "ns-1.awsdns-44.org",
+      "ns-2.awsdns-54.co.uk",
+      "ns-3.awsdns-14.net",
+      "ns-4.awsdns-01.com",
+    ]
+    "reference_name" = "dg0"
+  }
+  "dg1" = {
+    "id" = "N1XXXXXXXXXXXXXXXXXXX"
+    "name_servers" = [
+      "ns-5.awsdns-44.org",
+      "ns-6.awsdns-54.co.uk",
+      "ns-7.awsdns-14.net",
+      "ns-8.awsdns-01.com",
+    ]
+    "reference_name" = "dg1"
+  }
+}
+public_root_zones = {
+  "example.org" = {
+    "comment" = "Managed by Terraform"
+    "delegation_set_id" = "N0XXXXXXXXXXXXXXXXXXX"
+    "force_destroy" = false
+    "id" = "Z0YYYYYYYYYYYYYYYY"
+    "name" = "example.org."
+    "name_servers" = [
+      "ns-1.awsdns-44.org",
+      "ns-2.awsdns-54.co.uk",
+      "ns-3.awsdns-14.net",
+      "ns-4.awsdns-01.com",
+    ]
+    "tags" = {
+      "DelegationSetId" = "N0XXXXXXXXXXXXXXXXXXX"
+      "DelegationSetName" = "dg0"
+      "Name" = "example.org"
+    }
+    "vpc" = []
+    "zone_id" = "Z0YYYYYYYYYYYYYYYY"
+  }
+public_subdomain_default_ns_records = {
+  "internal.example.org" = {
+    "alias" = []
+    "failover_routing_policy" = []
+    "fqdn" = "internal.example.org"
+    "geolocation_routing_policy" = []
+    "id" = "Z1YYYYYYYYYYYYYYYY_internal.example.org_NS"
+    "latency_routing_policy" = []
+    "name" = "internal.example.org"
+    "records" = [
+      "ns-5.awsdns-44.org",
+      "ns-6.awsdns-54.co.uk",
+      "ns-7.awsdns-14.net",
+      "ns-8.awsdns-01.com",
+    ]
+    "ttl" = 30
+    "type" = "NS"
+    "weighted_routing_policy" = []
+    "zone_id" = "Z1YYYYYYYYYYYYYYYY"
+  }
+}
+public_subdomain_zones = {
+  "internal.example.org" = {
+    "comment" = "Managed by Terraform"
+    "delegation_set_id" = "N1XXXXXXXXXXXXXXXXXXX"
+    "force_destroy" = false
+    "id" = "Z1YYYYYYYYYYYYYYYY"
+    "name" = "internal.example.org."
+    "name_servers" = [
+      "ns-5.awsdns-44.org",
+      "ns-6.awsdns-54.co.uk",
+      "ns-7.awsdns-14.net",
+      "ns-8.awsdns-01.com",
+    ]
+    "tags" = {
+      "DelegationSetId" = "N1XXXXXXXXXXXXXXXXXXX"
+      "DelegationSetName" = "dg1"
+      "Name" = "internal.example.org"
+      "Root" = "example.org"
+    }
+    "vpc" = []
+    "zone_id" = "Z1YYYYYYYYYYYYYYYY"
+  }
 ```
 
 ## Authors

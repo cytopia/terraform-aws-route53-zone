@@ -11,19 +11,35 @@ provider "aws" {
 module "aws_route53zone" {
   source = "../.."
 
-  public_hosted_zones = [
-    "www.example.org",
-    "t2.example.org",
-    "www.example.com",
-    "t3.example.com",
+  delegation_sets = []
+
+  public_root_zones = [
+    {
+      name           = "example.com",
+      delegation_set = "root-zones",
+    },
+    {
+      name           = "example.org",
+      delegation_set = null,
+    },
   ]
 
-  default_subdomain_ns_ttl = "30"
-
-  comment = "Managed by Terraform"
-
-  tags = {
-    Environment = "example"
-    Owner       = "terraform"
-  }
+  # If delegation set is null, it will use AWS defaults.
+  # Specify your own nameserver or use an empty list to use AWS defaults.
+  public_subdomain_zones = [
+    {
+      name           = "internal.example.org",
+      root           = "example.org",
+      ns_ttl         = 30,
+      nameservers    = [],
+      delegation_set = null,
+    },
+    {
+      name           = "private.example.org",
+      root           = "example.org",
+      ns_ttl         = 30,
+      nameservers    = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
+      delegation_set = null,
+    },
+  ]
 }
