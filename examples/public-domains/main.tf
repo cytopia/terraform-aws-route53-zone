@@ -11,12 +11,18 @@ provider "aws" {
 module "aws_route53zone" {
   source = "../.."
 
-  public_hosted_zones = [
-    "example.org",
-    "example.com",
-  ]
+  delegation_sets = []
 
-  default_subdomain_ns_ttl = "30"
+  public_root_zones = [
+    {
+      name           = "example.com",
+      delegation_set = null,
+    },
+    {
+      name           = "example.org",
+      delegation_set = null,
+    },
+  ]
 
   comment = "Managed by Terraform"
 
