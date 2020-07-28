@@ -13,7 +13,7 @@ can be created with or without a delegation set. NS records for sub zones are ad
 
 ```hcl
 module "public_zone" {
-  source = "github.com/cytopia/terraform-aws-route53-zone?ref=v1.0.0"
+  source = "github.com/Flaconi/terraform-aws-route53-zone?ref=v1.0.0"
 
   # Create as many delegation sets as are required
   delegation_sets = [
