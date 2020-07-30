@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cytopia/terraform-aws-route53-zone.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-route53-zone)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-route53-zone.svg)](https://github.com/cytopia/terraform-aws-route53-zone/releases)
-[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--elb-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
+[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--route53--zone-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This Terraform module creates hosted zones for domains and subdomains. All specified hosted zones
@@ -13,7 +13,7 @@ can be created with or without a delegation set. NS records for sub zones are ad
 
 ```hcl
 module "public_zone" {
-  source = "github.com/Flaconi/terraform-aws-route53-zone?ref=v1.0.0"
+  source = "github.com/cytopia/terraform-aws-route53-zone?ref=v1.0.0"
 
   # Create as many delegation sets as are required
   delegation_sets = [
