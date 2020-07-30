@@ -16,16 +16,16 @@ variable "public_root_zones" {
   description = "Route53 root zone (also allows subdomain if this is your root starting point). Set delegation_set to 'null' to use no delegation set."
 }
 
-variable "public_subdomain_zones" {
+variable "public_secondary_zones" {
   type = list(object({
     name           = string,
-    root           = string,
+    parent         = string,
     ns_ttl         = number,
-    nameservers    = list(string),
+    ns_servers     = list(string),
     delegation_set = string,
   }))
   default     = []
-  description = "Route53 subdomain zone (root zone must be specified as well). Set delegation_set to 'null' to use no delegation set."
+  description = "Route53 secondary zone ('parent' zone must be specified as well). Set delegation_set to 'null' to use no delegation set. Use empty 'ns_servers' list to use AWS default nameserver."
 }
 
 variable "tags" {

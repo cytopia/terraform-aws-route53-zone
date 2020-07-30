@@ -88,7 +88,7 @@ No requirements.
 | comment | Default comment to add to all resources. | `string` | `"Managed by Terraform"` | no |
 | delegation\_sets | A set of four authoritative name servers that you can use with more than one hosted zone. By default, Route 53 assigns a random selection of name servers to each new hosted zone. To make it easier to migrate DNS service to Route 53 for a large number of domains, you can create a reusable delegation set and then associate the reusable delegation set with new hosted zones. | `list(string)` | `[]` | no |
 | public\_root\_zones | Route53 root zone (also allows subdomain if this is your root starting point). Set delegation\_set to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
-| public\_subdomain\_zones | Route53 subdomain zone (root zone must be specified as well). Set delegation\_set to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    root           = string,<br>    ns_ttl         = number,<br>    nameservers    = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
+| public\_secondary\_zones | Route53 secondary zone ('parent' zone must be specified as well). Set delegation\_set to 'null' to use no delegation set. Use empty 'ns\_servers' list to use AWS default nameserver. | <pre>list(object({<br>    name           = string,<br>    parent         = string,<br>    ns_ttl         = number,<br>    ns_servers     = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
 | tags | Default tags to additionally apply to all resources. | `map` | `{}` | no |
 
 ## Outputs
@@ -97,9 +97,8 @@ No requirements.
 |------|-------------|
 | delegation\_sets | Created delegation sets. |
 | public\_root\_zones | Created public root zones. |
-| public\_subdomain\_custom\_ns\_records | Created public subdomain default ns records. |
-| public\_subdomain\_default\_ns\_records | Created public subdomain default ns records. |
-| public\_subdomain\_zones | Created public subdomain zones. |
+| public\_secondary\_ns\_records | Created public secondary ns records. |
+| public\_secondary\_zones | Created public secondary zones. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
