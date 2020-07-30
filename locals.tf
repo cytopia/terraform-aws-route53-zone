@@ -40,12 +40,12 @@ locals {
 
 
 # -------------------------------------------------------------------------------------------------
-# Public subdomain zones
+# Public secondary zones
 # -------------------------------------------------------------------------------------------------
 locals {
   # Transforms from:
   # ----------------
-  # var.public_subdomain_zones = [
+  # var.public_secondary_zones = [
   #   {
   #     name = "intranet.example.tld",
   #     root = "example.tld",
@@ -64,55 +64,48 @@ locals {
   #
   # Transforms into:
   # ----------------
-  # local.public_subdomain_zones = {
+  # local.public_secondary_zones = {
   #   "intranet.example1.tld" {
   #     "name" = "intranet.example.tld"
-  #     "root" = "example.tld",
+  #     "parent" = "example.tld",
   #     "deleg_id" = "N0XXXXXXXXXXXXX"
   #     "deleg_name" = "deleg-name"
   #   },
   #   "private.example1.tld" {
   #     "name" = "private.example.tld"
-  #     "root" = "example.tld",
+  #     "parent" = "example.tld",
   #     "deleg_id" = null
   #     "deleg_name" = ""
   #   },
   # }
-  # local.public_subdomain_default_ns_records = {
+  # local.public_secondary_default_ns_records = {
   #   "intranet.example1.tld" {
   #     "name" = "intranet.example.tld"
-  #     "root" = "example.tld",
+  #     "parent" = "example.tld",
   #   },
   # }
-  # local.public_subdomain_custom_ns_records = {
+  # local.public_secondary_custom_ns_records = {
   #   "private.example1.tld" {
   #     "name" = "private.example.tld"
-  #     "root" = "example.tld",
+  #     "parent" = "example.tld",
   #     "nameservers" = ["1,1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
   #     "ns_ttl" = 30,
   #   },
   # }
-  public_subdomain_zones = {
-    for zone in var.public_subdomain_zones : zone.name => {
+  public_secondary_zones = {
+    for zone in var.public_secondary_zones : zone.name => {
       name       = zone.name
-      root       = zone.root
+      parent     = zone.parent
       deleg_id   = zone.delegation_set != null ? aws_route53_delegation_set.delegation_sets[zone.delegation_set]["id"] : null
       deleg_name = zone.delegation_set != null ? zone.delegation_set : ""
     }
   }
-  public_subdomain_default_ns_records = {
-    for zone in var.public_subdomain_zones : zone.name => {
-      name   = zone.name
-      root   = zone.root
-      ns_ttl = zone.ns_ttl
-    } if length(zone.nameservers) == 0
-  }
-  public_subdomain_custom_ns_records = {
-    for zone in var.public_subdomain_zones : zone.name => {
-      name        = zone.name
-      root        = zone.root
-      nameservers = zone.nameservers
-      ns_ttl      = zone.ns_ttl
-    } if length(zone.nameservers) > 0
+  public_secondary_ns_records = {
+    for zone in var.public_secondary_zones : zone.name => {
+      name       = zone.name
+      parent     = zone.parent
+      ns_ttl     = zone.ns_ttl
+      ns_servers = length(zone.ns_servers) == 0 ? aws_route53_zone.public_secondary_zones[zone.name]["name_servers"] : zone.ns_servers
+    }
   }
 }
