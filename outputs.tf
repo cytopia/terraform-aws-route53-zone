@@ -26,34 +26,24 @@ output "public_root_zones" {
 
 
 # -------------------------------------------------------------------------------------------------
-# Route53 Public Subdomain Zones
+# Route53 Public Subdomain Zones (secondary)
 # -------------------------------------------------------------------------------------------------
-#output "local_public_subdomain_zones" {
-#  value       = local.public_subdomain_zones
-#  description = "Transformed public subdomain zones."
+#output "local_public_secondary_zones" {
+#  value       = local.public_secondary_zones
+#  description = "Transformed public secondary zones."
 #}
 
-#output "local_public_subdomain_default_ns_records" {
-#  value       = local.public_subdomain_default_ns_records
-#  description = "Transformed public subdomain default ns records."
+#output "local_public_secondary_ns_records" {
+#  value       = local.public_secondary_ns_records
+#  description = "Transformed public secondary ns records."
 #}
 
-#output "local_public_subdomain_custom_ns_records" {
-#  value       = local.public_subdomain_custom_ns_records
-#  description = "Transformed public subdomain custom ns records."
-#}
-
-output "public_subdomain_zones" {
-  value       = aws_route53_zone.public_subdomain_zones
-  description = "Created public subdomain zones."
+output "public_secondary_zones" {
+  value       = aws_route53_zone.public_secondary_zones
+  description = "Created public secondary zones."
 }
 
-output "public_subdomain_default_ns_records" {
-  value       = aws_route53_record.public_subdomain_default_ns_records
-  description = "Created public subdomain default ns records."
-}
-
-output "public_subdomain_custom_ns_records" {
-  value       = aws_route53_record.public_subdomain_custom_ns_records
-  description = "Created public subdomain default ns records."
+output "public_secondary_ns_records" {
+  value       = aws_route53_record.public_secondary_ns_records
+  description = "Created public secondary ns records."
 }
