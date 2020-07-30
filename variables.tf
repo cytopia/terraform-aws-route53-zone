@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Optional Variables
+# Optional Public Zone Variables
 # -------------------------------------------------------------------------------------------------
 variable "delegation_sets" {
   type        = list(string)
@@ -13,7 +13,7 @@ variable "public_root_zones" {
     delegation_set = string,
   }))
   default     = []
-  description = "Route53 root zone (also allows subdomain if this is your root starting point). Set delegation_set to 'null' to use no delegation set."
+  description = "Public Route53 root zone (also allows subdomain if this is your root starting point). Set delegation_set to 'null' to use no delegation set."
 }
 
 variable "public_secondary_zones" {
@@ -25,9 +25,29 @@ variable "public_secondary_zones" {
     delegation_set = string,
   }))
   default     = []
-  description = "Route53 secondary zone ('parent' zone must be specified as well). Set delegation_set to 'null' to use no delegation set. Use empty 'ns_servers' list to use AWS default nameserver."
+  description = "Public Route53 secondary zone ('parent' zone must be specified as well). Set delegation_set to 'null' to use no delegation set. Use empty 'ns_servers' list to use AWS default nameserver."
 }
 
+
+# -------------------------------------------------------------------------------------------------
+# Optional Private Zone Variables
+# -------------------------------------------------------------------------------------------------
+variable "private_root_zones" {
+  type = list(object({
+    name = string,
+    vpc_ids = list(object({
+      id     = string,
+      region = string,
+    })),
+  }))
+  default     = []
+  description = "Private Route53 root zone (also allows subdomain if this is your root starting point). Note, by default the default VPC will always be attached, even if vpc_ids or vpc_tags are empty."
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Optional Misc Variables
+# -------------------------------------------------------------------------------------------------
 variable "tags" {
   type        = map
   default     = {}

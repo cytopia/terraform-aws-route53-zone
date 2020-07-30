@@ -12,7 +12,7 @@ output "delegation_sets" {
 
 
 # -------------------------------------------------------------------------------------------------
-# Route53 Public Root Zones
+# Public Route53 Root Zones
 # -------------------------------------------------------------------------------------------------
 #output "local_public_root_zones" {
 #  value       = local.public_root_zones
@@ -26,7 +26,7 @@ output "public_root_zones" {
 
 
 # -------------------------------------------------------------------------------------------------
-# Route53 Public Subdomain Zones (secondary)
+# Public Route53 Subdomain Zones (secondary)
 # -------------------------------------------------------------------------------------------------
 #output "local_public_secondary_zones" {
 #  value       = local.public_secondary_zones
@@ -46,4 +46,18 @@ output "public_secondary_zones" {
 output "public_secondary_ns_records" {
   value       = aws_route53_record.public_secondary_ns_records
   description = "Created public secondary ns records."
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Private Route53 Root Zones
+# -------------------------------------------------------------------------------------------------
+#output "local_private_root_zones" {
+#  value       = local.private_root_zones
+#  description = "Transformed private root zones."
+#}
+
+output "private_root_zones" {
+  value       = aws_route53_zone.private_root_zones
+  description = "Created private root zones."
 }

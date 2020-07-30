@@ -52,10 +52,6 @@ resource "aws_route53_zone" "public_secondary_zones" {
   depends_on = [aws_route53_zone.public_root_zones]
 }
 
-
-# -------------------------------------------------------------------------------------------------
-# Public secondary zone  dns records
-# -------------------------------------------------------------------------------------------------
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_zone#public-subdomain-zone
 resource "aws_route53_record" "public_secondary_ns_records" {
   for_each = local.public_secondary_ns_records
@@ -68,4 +64,35 @@ resource "aws_route53_record" "public_secondary_ns_records" {
   records = each.value.ns_servers
 
   depends_on = [aws_route53_zone.public_secondary_zones]
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Private root zones
+# -------------------------------------------------------------------------------------------------
+data "aws_vpc" "default" {
+  default = true
+}
+data "aws_region" "current" {}
+
+resource "aws_route53_zone" "private_root_zones" {
+  for_each = local.private_root_zones
+
+  name    = each.value.name
+  comment = var.comment
+
+  dynamic "vpc" {
+    for_each = { for vpc in concat([{ "id" = data.aws_vpc.default.id, "region" = data.aws_region.current.name }], each.value.vpc_ids) : vpc.id => vpc }
+    content {
+      vpc_id     = vpc.value.id
+      vpc_region = vpc.value.region
+    }
+  }
+
+  tags = merge(
+    map("Name", each.value.name),
+    var.tags
+  )
+
+  depends_on = [data.aws_vpc.default, data.aws_region.current]
 }

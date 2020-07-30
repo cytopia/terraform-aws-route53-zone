@@ -109,3 +109,40 @@ locals {
     }
   }
 }
+
+
+# -------------------------------------------------------------------------------------------------
+# Private root zones
+# -------------------------------------------------------------------------------------------------
+locals {
+  # Transforms from:
+  # ----------------
+  # var.private_root_zones = [
+  #   {
+  #     name     = "example1.tld",
+  #     vpc_ids  = [{"id"="vpc-11111", "region"="eu-central"}],
+  #   },
+  #   {
+  #     name     = "example2.tld",
+  #     vpc_ids  = [{"id"="vpc-11111", "region"="eu-central"}],
+  #   },
+  # ]
+  #
+  # Transforms into:
+  # ----------------
+  # local.private_root_zones = {
+  #   "example1.tld" {
+  #     "name"    = "example1.tld"
+  #      vpc_ids  = [{"id"="vpc-11111", "region"="eu-central"}],
+  #   },
+  #   "example2.tld" {
+  #     "name"    = "example2.tld"
+  #      vpc_ids  = [{"id"="vpc-11111", "region"="eu-central"}],
+  #   },
+  private_root_zones = {
+    for zone in var.private_root_zones : zone.name => {
+      name    = zone.name
+      vpc_ids = zone.vpc_ids
+    }
+  }
+}

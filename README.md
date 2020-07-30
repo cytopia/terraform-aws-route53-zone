@@ -5,8 +5,10 @@
 [![Terraform](https://img.shields.io/badge/Terraform--registry-aws--elb-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-This Terraform module creates hosted zones for domains and subdomains. All specified hosted zones
-can be created with or without a delegation set. NS records for sub zones are added automatically.
+This Terraform module creates hosted zones for domains and subdomains.
+All specified public hosted zones can be created with or without a delegation set.
+Private zones will always have the default VPC from the current region attached, but can optionally also attach more from any region.
+NS records for sub zones are added automatically.
 
 
 ## Usage
@@ -35,20 +37,33 @@ module "public_zone" {
 
   # If delegation set is null, it will use AWS defaults.
   # Specify your own nameserver or use an empty list to use AWS defaults.
-  public_subdomain_zones = [
+  public_secondary_zones = [
     {
       name           = "internal.example.org",
-      root           = "example.org",
+      parent         = "example.org",
       ns_ttl         = 30,
       nameservers    = [],
       delegation_set = null,
     },
     {
       name           = "private.example.org",
-      root           = "example.org",
+      parent         = "example.org",
       ns_ttl         = 30,
       nameservers    = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
       delegation_set = "sub-zone",
+    },
+  ]
+
+  # Add private zones.
+  # NOTE: They are always attached to the default vpc of the current region
+  private_root_zones = [
+    {
+      name     = "private.loc",
+      vpc_ids  = [],
+    },
+    {
+      name     = "private.local",
+      vpc_ids  = [{"id": "vpc-xxxxxxxxxx", "region": "eu-central-1"}],
     },
   ]
 
@@ -56,7 +71,7 @@ module "public_zone" {
     Environment    = "prod"
     Infrastructure = "core"
     Owner          = "terraform"
-    Project        = "zones-public"
+    Project        = "route53-zone"
   }
 
   comment = "Managed by Terraform"
@@ -66,6 +81,7 @@ module "public_zone" {
 
 ## Examples
 
+* [private-domains](examples/private-domains)
 * [public-domains](examples/public-domains)
 * [public-subdomains](examples/public-subdomains)
 
@@ -174,7 +190,7 @@ public_subdomain_default_ns_records = {
     "zone_id" = "Z1YYYYYYYYYYYYYYYY"
   }
 }
-public_subdomain_zones = {
+public_secondary_zones = {
   "internal.example.org" = {
     "comment" = "Managed by Terraform"
     "delegation_set_id" = "N1XXXXXXXXXXXXXXXXXXX"
