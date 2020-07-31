@@ -2,13 +2,15 @@
 
 [![Build Status](https://travis-ci.org/cytopia/terraform-aws-route53-zone.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-route53-zone)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-route53-zone.svg)](https://github.com/cytopia/terraform-aws-route53-zone/releases)
-[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--elb-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
+[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--route53--zone-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-This Terraform module creates hosted zones for domains and subdomains.
-All specified public hosted zones can be created with or without a delegation set.
-Private zones will always have the default VPC from the current region attached, but can optionally also attach more from any region.
-NS records for sub zones are added automatically.
+This Terraform module is able to create **delegation sets**, **public** and **private** hosted zones for root and delegated domains.
+
+**Public** hosted zones can be created with or without a delegation set.
+**Private** hosted zones will always have the default VPC from the current region attached, but can optionally also attach more VPC's from any region.
+
+**NS records** for sub zones are added automatically to their corresponding root zone, allowing the user to customize the TTL.
 
 
 ## Usage
@@ -54,8 +56,9 @@ module "public_zone" {
     },
   ]
 
-  # Add private zones.
-  # NOTE: They are always attached to the default vpc of the current region
+  # Add private zones
+  # All private zones will be attached to the default VPC of the current region.
+  # Optionally also attach more VPC's by id and region.
   private_root_zones = [
     {
       name     = "private.loc",
