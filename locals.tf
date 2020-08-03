@@ -102,10 +102,10 @@ locals {
   }
   public_delegated_secondary_ns_records = {
     for zone in var.public_delegated_secondary_zones : zone.name => {
-      name       = zone.name
-      parent     = zone.parent
-      ns_ttl     = zone.ns_ttl
-      ns_servers = length(zone.ns_servers) == 0 ? aws_route53_zone.public_delegated_secondary_zones[zone.name]["name_servers"] : zone.ns_servers
+      name    = zone.name
+      parent  = zone.parent
+      ns_ttl  = zone.ns_ttl
+      ns_list = length(zone.ns_list) == 0 ? aws_route53_zone.public_delegated_secondary_zones[zone.name]["name_servers"] : zone.ns_list
     }
   }
 }

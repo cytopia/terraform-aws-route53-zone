@@ -31,14 +31,14 @@ module "aws_route53zone" {
       name           = "internal.example.org",
       parent         = "example.org",
       ns_ttl         = 30,
-      ns_servers     = [],
+      ns_list        = [],
       delegation_set = null,
     },
     {
       name           = "private.example.org",
       parent         = "example.org",
       ns_ttl         = 30,
-      ns_servers     = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
+      ns_list        = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
       delegation_set = null,
     },
   ]

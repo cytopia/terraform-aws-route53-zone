@@ -50,14 +50,14 @@ module "public_zone" {
       name           = "internal.example.org",
       parent         = "example.org",
       ns_ttl         = 30,
-      ns_servers     = [],
+      ns_list        = [],
       delegation_set = null,
     },
     {
       name           = "private.example.org",
       parent         = "example.org",
       ns_ttl         = 30,
-      ns_servers     = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
+      ns_list        = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
       delegation_set = "sub-zone",
     },
   ]
@@ -116,7 +116,7 @@ No requirements.
 | comment | Default comment to add to all resources. | `string` | `"Managed by Terraform"` | no |
 | delegation\_sets | A list of delegation sets to create. You only need to specify the alias names that can then be referenced by other variables in this module via this unique name. A delegation set is a set of four authoritative name servers that you can use with more than one hosted zone. By default, Route 53 assigns a random selection of name servers to each new hosted zone. To make it easier to migrate DNS service to Route 53 for a large number of domains, you can create a reusable delegation set and then associate the reusable delegation set with new hosted zones. | `list(string)` | `[]` | no |
 | private\_root\_zones | Private Route53 root zone (also allows subdomain if this is your root starting point). Note, by default the default VPC will always be attached, even if vpc\_ids or vpc\_tags are empty. | <pre>list(object({<br>    name = string,<br>    vpc_ids = list(object({<br>      id     = string,<br>      region = string,<br>    })),<br>  }))</pre> | `[]` | no |
-| public\_delegated\_secondary\_zones | A list of public Route53 delegated secondary zones. Each item must specify its 'parent' by name, which must match the name defined in the 'public\_root\_zones' variables and must also be exactly one level deeper than the corresponding root zone item. By doing so, this module will automatically add nameservers into the root zone to create the delegation. You can also attach a delegation\_set to this zone by its reference name (if it has been defined in the 'delegation\_sets' list) or set it to 'null' to use no delegation set. Additionally you can also define your own name servers for this zone by specifying them in the `ns_servers` list or just leave the list empty to use AWS default name server. | <pre>list(object({<br>    name           = string,<br>    parent         = string,<br>    ns_ttl         = number,<br>    ns_servers     = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
+| public\_delegated\_secondary\_zones | A list of public Route53 delegated secondary zones. Each item must specify its 'parent' by name, which must match the name defined in the 'public\_root\_zones' variables and must also be exactly one level deeper than the corresponding root zone item. By doing so, this module will automatically add nameservers into the root zone to create the delegation. You can also attach a delegation\_set to this zone by its reference name (if it has been defined in the 'delegation\_sets' list) or set it to 'null' to use no delegation set. Additionally you can also define your own name servers for this zone by specifying them in the `ns_list` list or just leave the list empty to use AWS default name server. | <pre>list(object({<br>    name           = string,<br>    parent         = string,<br>    ns_ttl         = number,<br>    ns_list        = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
 | public\_root\_zones | A list of public Route53 root zones. A 'root zone' can be anything from a tld to any level of subdomain, if and only if this is your root starting point for this (sub-)domain on the current AWS account. You can also attach a delegation\_set to this root zone by its reference name (if it has been defined in the 'delegation\_sets' list) or set it to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
 | tags | Default tags to additionally apply to all resources. | `map` | `{}` | no |
 
