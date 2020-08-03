@@ -11,7 +11,7 @@ This Terraform module is able to create **delegation sets**, **public** and **pr
 **Private** hosted zones will always have the default VPC from the current region attached, but can optionally also attach more VPCs from any region.
 
 When adding delegated secondary zones, the **NS records** are added automatically to their corresponding root zone.
-The only thing to you need to choose is the TTL in seconds of those NS records per item.
+The only thing you need to choose, is the TTL (in seconds), of those NS records, per item.
 
 
 ## Usage
