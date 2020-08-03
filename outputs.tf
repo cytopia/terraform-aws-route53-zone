@@ -28,24 +28,24 @@ output "public_root_zones" {
 # -------------------------------------------------------------------------------------------------
 # Public Route53 Subdomain Zones (secondary)
 # -------------------------------------------------------------------------------------------------
-#output "local_public_secondary_zones" {
-#  value       = local.public_secondary_zones
+#output "local_public_delegated_secondary_zones" {
+#  value       = local.public_delegated_secondary_zones
 #  description = "Transformed public secondary zones."
 #}
 
-#output "local_public_secondary_ns_records" {
-#  value       = local.public_secondary_ns_records
+#output "local_public_delegated_secondary_ns_records" {
+#  value       = local.public_delegated_secondary_ns_records
 #  description = "Transformed public secondary ns records."
 #}
 
-output "public_secondary_zones" {
-  value       = aws_route53_zone.public_secondary_zones
-  description = "Created public secondary zones."
+output "public_delegated_secondary_zones" {
+  value       = aws_route53_zone.public_delegated_secondary_zones
+  description = "Created public delegated secondary zones."
 }
 
-output "public_secondary_ns_records" {
-  value       = aws_route53_record.public_secondary_ns_records
-  description = "Created public secondary ns records."
+output "public_delegated_secondary_ns_records" {
+  value       = aws_route53_record.public_delegated_secondary_ns_records
+  description = "Created NS records in your root zone for delegated secondary zones."
 }
 
 

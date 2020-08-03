@@ -45,7 +45,7 @@ locals {
 locals {
   # Transforms from:
   # ----------------
-  # var.public_secondary_zones = [
+  # var.public_delegated_secondary_zones = [
   #   {
   #     name = "intranet.example.tld",
   #     root = "example.tld",
@@ -64,7 +64,7 @@ locals {
   #
   # Transforms into:
   # ----------------
-  # local.public_secondary_zones = {
+  # local.public_delegated_secondary_zones = {
   #   "intranet.example1.tld" {
   #     "name" = "intranet.example.tld"
   #     "parent" = "example.tld",
@@ -78,13 +78,13 @@ locals {
   #     "deleg_name" = ""
   #   },
   # }
-  # local.public_secondary_default_ns_records = {
+  # local.public_delegated_secondary_default_ns_records = {
   #   "intranet.example1.tld" {
   #     "name" = "intranet.example.tld"
   #     "parent" = "example.tld",
   #   },
   # }
-  # local.public_secondary_custom_ns_records = {
+  # local.public_delegated_secondary_custom_ns_records = {
   #   "private.example1.tld" {
   #     "name" = "private.example.tld"
   #     "parent" = "example.tld",
@@ -92,20 +92,20 @@ locals {
   #     "ns_ttl" = 30,
   #   },
   # }
-  public_secondary_zones = {
-    for zone in var.public_secondary_zones : zone.name => {
+  public_delegated_secondary_zones = {
+    for zone in var.public_delegated_secondary_zones : zone.name => {
       name       = zone.name
       parent     = zone.parent
       deleg_id   = zone.delegation_set != null ? aws_route53_delegation_set.delegation_sets[zone.delegation_set]["id"] : null
       deleg_name = zone.delegation_set != null ? zone.delegation_set : ""
     }
   }
-  public_secondary_ns_records = {
-    for zone in var.public_secondary_zones : zone.name => {
+  public_delegated_secondary_ns_records = {
+    for zone in var.public_delegated_secondary_zones : zone.name => {
       name       = zone.name
       parent     = zone.parent
       ns_ttl     = zone.ns_ttl
-      ns_servers = length(zone.ns_servers) == 0 ? aws_route53_zone.public_secondary_zones[zone.name]["name_servers"] : zone.ns_servers
+      ns_servers = length(zone.ns_servers) == 0 ? aws_route53_zone.public_delegated_secondary_zones[zone.name]["name_servers"] : zone.ns_servers
     }
   }
 }

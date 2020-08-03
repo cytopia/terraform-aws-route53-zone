@@ -33,8 +33,8 @@ resource "aws_route53_zone" "public_root_zones" {
 # -------------------------------------------------------------------------------------------------
 # Public secondary zones
 # -------------------------------------------------------------------------------------------------
-resource "aws_route53_zone" "public_secondary_zones" {
-  for_each = local.public_secondary_zones
+resource "aws_route53_zone" "public_delegated_secondary_zones" {
+  for_each = local.public_delegated_secondary_zones
 
   name    = each.value.name
   comment = var.comment
@@ -53,8 +53,8 @@ resource "aws_route53_zone" "public_secondary_zones" {
 }
 
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_zone#public-subdomain-zone
-resource "aws_route53_record" "public_secondary_ns_records" {
-  for_each = local.public_secondary_ns_records
+resource "aws_route53_record" "public_delegated_secondary_ns_records" {
+  for_each = local.public_delegated_secondary_ns_records
 
   zone_id = aws_route53_zone.public_root_zones[each.value.parent]["id"]
   name    = each.value.name
@@ -63,7 +63,7 @@ resource "aws_route53_record" "public_secondary_ns_records" {
 
   records = each.value.ns_servers
 
-  depends_on = [aws_route53_zone.public_secondary_zones]
+  depends_on = [aws_route53_zone.public_delegated_secondary_zones]
 }
 
 
