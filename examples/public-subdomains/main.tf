@@ -26,19 +26,19 @@ module "aws_route53zone" {
 
   # If delegation set is null, it will use AWS defaults.
   # Specify your own nameserver or use an empty list to use AWS defaults.
-  public_secondary_zones = [
+  public_delegated_secondary_zones = [
     {
       name           = "internal.example.org",
       parent         = "example.org",
       ns_ttl         = 30,
-      ns_servers     = [],
+      ns_list        = [],
       delegation_set = null,
     },
     {
       name           = "private.example.org",
       parent         = "example.org",
       ns_ttl         = 30,
-      ns_servers     = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
+      ns_list        = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
       delegation_set = null,
     },
   ]

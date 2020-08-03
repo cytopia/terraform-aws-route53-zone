@@ -19,6 +19,8 @@ install: true
 ###
 before_script:
   - make lint
+  - make gen
+  - git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
 
 
 ###
