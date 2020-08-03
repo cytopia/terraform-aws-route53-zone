@@ -8,7 +8,7 @@
 This Terraform module is able to create **delegation sets**, **public** and **private** hosted zones for root and delegated domains.
 
 **Public** hosted zones can be created with or without a delegation set.
-**Private** hosted zones will always have the default VPC from the current region attached, but can optionally also attach more VPC's from any region.
+**Private** hosted zones will always have the default VPC from the current region attached, but can optionally also attach more VPCs from any region.
 
 **NS records** for sub zones are added automatically to their corresponding root zone, allowing the user to customize the TTL.
 
@@ -58,7 +58,7 @@ module "public_zone" {
 
   # Add private zones
   # All private zones will be attached to the default VPC of the current region.
-  # Optionally also attach more VPC's by id and region.
+  # Optionally also attach more VPCs by id and region.
   private_root_zones = [
     {
       name     = "private.loc",
