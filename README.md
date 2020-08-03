@@ -2,11 +2,16 @@
 
 [![Build Status](https://travis-ci.org/cytopia/terraform-aws-route53-zone.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-route53-zone)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-route53-zone.svg)](https://github.com/cytopia/terraform-aws-route53-zone/releases)
-[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--elb-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
+[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--route53--zone-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-This Terraform module creates hosted zones for domains and subdomains. All specified hosted zones
-can be created with or without a delegation set. NS records for sub zones are added automatically.
+This Terraform module is able to create **delegation sets**, **public** and **private** hosted zones for root and delegated domains.
+
+**Public** hosted zones can be created with or without a delegation set.
+**Private** hosted zones will always have the default VPC from the current region attached, but can optionally also attach more VPCs from any region.
+
+When adding delegated secondary zones, the **NS records** are added automatically to their corresponding root zone.
+The only thing you need to choose, is the TTL (in seconds), of those NS records, per item.
 
 
 ## Usage
@@ -15,13 +20,16 @@ can be created with or without a delegation set. NS records for sub zones are ad
 module "public_zone" {
   source = "github.com/Flaconi/terraform-aws-route53-zone?ref=v1.0.0"
 
-  # Create as many delegation sets as are required
+  # Create as many delegation sets by reference name as are required.
   delegation_sets = [
     "root-zone",
     "sub-zone",
   ]
 
-  # If delegation set is null, it will use AWS defaults.
+  # Specify your root zones.
+  # Tld or subdomain of any level to make this your starting point on the current AWS account.
+  # If delegation set is null, it will use AWS defaults. otherwise specify the delegation set
+  # by reference name as defined in 'delegation_sets' above.
   public_root_zones = [
     {
       name           = "example.com",
@@ -33,32 +41,51 @@ module "public_zone" {
     },
   ]
 
-  # If delegation set is null, it will use AWS defaults.
-  # Specify your own nameserver or use an empty list to use AWS defaults.
-  public_subdomain_zones = [
+  # Specify your delegated secondary zones (must have their parents defined in 'public_zones')
+  # If delegation set is null, it will use AWS defaults. otherwise specify the delegation set
+  # by reference name as defined in 'delegation_sets' above.
+  # Specify your own name servers or use an empty list to use AWS defaults.
+  public_delegated_secondary_zones = [
     {
       name           = "internal.example.org",
-      root           = "example.org",
+      parent         = "example.org",
       ns_ttl         = 30,
-      nameservers    = [],
+      ns_list        = [],
       delegation_set = null,
     },
     {
       name           = "private.example.org",
-      root           = "example.org",
+      parent         = "example.org",
       ns_ttl         = 30,
-      nameservers    = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
+      ns_list        = ["1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4"],
       delegation_set = "sub-zone",
     },
   ]
 
+  # Specify your private zones.
+  # All private zones will be attached to the default VPC of the current region.
+  # Optionally also attach more VPCs by id and region.
+  private_root_zones = [
+    {
+      name     = "private.loc",
+      vpc_ids  = [],
+    },
+    {
+      name     = "private.local",
+      vpc_ids  = [{"id": "vpc-xxxxxxxxxx", "region": "eu-central-1"}],
+    },
+  ]
+
+  # A set of default tags to add to all managed resources.
+  # The 'Name' tag will be added automatically with the value of the domain of each item.
   tags = {
     Environment    = "prod"
     Infrastructure = "core"
     Owner          = "terraform"
-    Project        = "zones-public"
+    Project        = "route53-zone"
   }
 
+  # The default comment to add to all managed resources.
   comment = "Managed by Terraform"
 }
 ```
@@ -66,6 +93,7 @@ module "public_zone" {
 
 ## Examples
 
+* [private-domains](examples/private-domains)
 * [public-domains](examples/public-domains)
 * [public-subdomains](examples/public-subdomains)
 
@@ -86,9 +114,10 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | comment | Default comment to add to all resources. | `string` | `"Managed by Terraform"` | no |
-| delegation\_sets | A set of four authoritative name servers that you can use with more than one hosted zone. By default, Route 53 assigns a random selection of name servers to each new hosted zone. To make it easier to migrate DNS service to Route 53 for a large number of domains, you can create a reusable delegation set and then associate the reusable delegation set with new hosted zones. | `list(string)` | `[]` | no |
-| public\_root\_zones | Route53 root zone (also allows subdomain if this is your root starting point). Set delegation\_set to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
-| public\_secondary\_zones | Route53 secondary zone ('parent' zone must be specified as well). Set delegation\_set to 'null' to use no delegation set. Use empty 'ns\_servers' list to use AWS default nameserver. | <pre>list(object({<br>    name           = string,<br>    parent         = string,<br>    ns_ttl         = number,<br>    ns_servers     = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
+| delegation\_sets | A list of delegation sets to create. You only need to specify the alias names that can then be referenced by other variables in this module via this unique name. A delegation set is a set of four authoritative name servers that you can use with more than one hosted zone. By default, Route 53 assigns a random selection of name servers to each new hosted zone. To make it easier to migrate DNS service to Route 53 for a large number of domains, you can create a reusable delegation set and then associate the reusable delegation set with new hosted zones. | `list(string)` | `[]` | no |
+| private\_root\_zones | Private Route53 root zone (also allows subdomain if this is your root starting point). Note, by default the default VPC will always be attached, even if vpc\_ids or vpc\_tags are empty. | <pre>list(object({<br>    name = string,<br>    vpc_ids = list(object({<br>      id     = string,<br>      region = string,<br>    })),<br>  }))</pre> | `[]` | no |
+| public\_delegated\_secondary\_zones | A list of public Route53 delegated secondary zones. Each item must specify its 'parent' by name, which must match the name defined in the 'public\_root\_zones' variables and must also be exactly one level deeper than the corresponding root zone item. By doing so, this module will automatically add nameservers into the root zone to create the delegation. You can also attach a delegation\_set to this zone by its reference name (if it has been defined in the 'delegation\_sets' list) or set it to 'null' to use no delegation set. Additionally you can also define your own name servers for this zone by specifying them in the `ns_list` list or just leave the list empty to use AWS default name server. | <pre>list(object({<br>    name           = string,<br>    parent         = string,<br>    ns_ttl         = number,<br>    ns_list        = list(string),<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
+| public\_root\_zones | A list of public Route53 root zones. A 'root zone' can be anything from a tld to any level of subdomain, if and only if this is your root starting point for this (sub-)domain on the current AWS account. You can also attach a delegation\_set to this root zone by its reference name (if it has been defined in the 'delegation\_sets' list) or set it to 'null' to use no delegation set. | <pre>list(object({<br>    name           = string,<br>    delegation_set = string,<br>  }))</pre> | `[]` | no |
 | tags | Default tags to additionally apply to all resources. | `map` | `{}` | no |
 
 ## Outputs
@@ -96,9 +125,10 @@ No requirements.
 | Name | Description |
 |------|-------------|
 | delegation\_sets | Created delegation sets. |
+| private\_root\_zones | Created private root zones. |
+| public\_delegated\_secondary\_ns\_records | Created NS records in your root zone for delegated secondary zones. |
+| public\_delegated\_secondary\_zones | Created public delegated secondary zones. |
 | public\_root\_zones | Created public root zones. |
-| public\_secondary\_ns\_records | Created public secondary ns records. |
-| public\_secondary\_zones | Created public secondary zones. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
@@ -153,7 +183,7 @@ public_root_zones = {
     "vpc" = []
     "zone_id" = "Z0YYYYYYYYYYYYYYYY"
   }
-public_subdomain_default_ns_records = {
+public_delegated_secondary_ns_records = {
   "internal.example.org" = {
     "alias" = []
     "failover_routing_policy" = []
@@ -174,7 +204,7 @@ public_subdomain_default_ns_records = {
     "zone_id" = "Z1YYYYYYYYYYYYYYYY"
   }
 }
-public_subdomain_zones = {
+public_delegated_secondary_zones = {
   "internal.example.org" = {
     "comment" = "Managed by Terraform"
     "delegation_set_id" = "N1XXXXXXXXXXXXXXXXXXX"
