@@ -91,6 +91,18 @@ module "public_zone" {
 ```
 
 
+## Resource tagging
+
+This module will add certain tags to specific resources by default. The `tags` variable extends these and adds additional tags to the resources.
+
+| Tags                | Condition                                         | Description            |
+|---------------------|---------------------------------------------------|------------------------|
+| `Name`              | Always on all zones                               | Name of domain         |
+| `Parent`            | On public delegated zones                         | Name of parent domain  |
+| `DelegationSetId`   | On public zones which are using a delegation set  | Name of delegation set |
+| `DelegationSetName` | On public zones which are using a delegation set  | ID of delegation set   |
+
+
 ## Examples
 
 * [private-domains](examples/private-domains)
