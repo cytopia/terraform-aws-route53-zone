@@ -113,6 +113,36 @@ This module will add certain tags to specific resources by default. The `tags` v
 | `DelegationSetName` | On public zones which are using a delegation set  | ID of delegation set   |
 
 
+## Importing existing resources
+
+In case you have existing resources and want to import them into this module, use the following commands:
+
+### Delegation sets
+```bash
+# List available delegation sets
+aws route53 list-reusable-delegation-sets
+
+# Define them in tfvars
+delegation_sets = [
+  "",  # <- If a delegation set is nameless, use an empty string
+  "deleg1",
+]
+
+# Import them
+terraform import 'aws_route53_delegation_set.delegation_sets[""]' <DELEG-ID>
+terraform import 'aws_route53_delegation_set.delegation_sets["deleg1"]' <DELEG-ID>
+```
+
+### Zones
+```bash
+# Public root zone
+terraform import 'aws_route53_zone.public_root_zones["www.example.com"]' <ZONE-ID>
+
+# Private root zone
+terraform import 'aws_route53_zone.private_root_zones["private.example.com"]' <ZONE-ID>
+```
+
+
 ## Examples
 
 * [private-domains](examples/private-domains)
