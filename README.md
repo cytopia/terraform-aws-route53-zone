@@ -1,11 +1,21 @@
 # Terraform module: AWS Route53 Zone
 
+**[Usage](#usage)** |
+**[Tagging](#resource-tagging)** |
+**[Importing](#importing-existing-resources)** |
+**[Examples](#examples)** |
+**[Requirements](#requirements)** |
+**[Providers](#providers)** |
+**[Inputs](#inputs)** |
+**[Outputs](#outputs)** |
+**[License](#license)**
+
 [![Build Status](https://travis-ci.org/cytopia/terraform-aws-route53-zone.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-route53-zone)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-route53-zone.svg)](https://github.com/cytopia/terraform-aws-route53-zone/releases)
 [![Terraform](https://img.shields.io/badge/Terraform--registry-aws--route53--zone-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-This Terraform module is able to create **delegation sets**, **public** and **private** hosted zones for root and delegated domains.
+This Terraform module is able to create an arbitrary number of **delegation sets**, **public** and **private** hosted zones for root and delegated domains.
 
 **Public** hosted zones can be created with or without a delegation set.
 **Private** hosted zones will always have the default VPC from the current region attached, but can optionally also attach more VPCs from any region.
@@ -91,6 +101,48 @@ module "public_zone" {
 ```
 
 
+## Resource tagging
+
+This module will add certain tags to specific resources by default. The `tags` variable extends these and adds additional tags to the resources.
+
+| Tags                | Condition                                         | Description            |
+|---------------------|---------------------------------------------------|------------------------|
+| `Name`              | Always on all zones                               | Name of domain         |
+| `Parent`            | On public delegated zones                         | Name of parent domain  |
+| `DelegationSetId`   | On public zones which are using a delegation set  | Name of delegation set |
+| `DelegationSetName` | On public zones which are using a delegation set  | ID of delegation set   |
+
+
+## Importing existing resources
+
+In case you have existing resources and want to import them into this module, use the following commands:
+
+### Delegation sets
+```bash
+# List available delegation sets
+aws route53 list-reusable-delegation-sets
+
+# Define them in tfvars
+delegation_sets = [
+  "",  # <- If a delegation set is nameless, use an empty string
+  "deleg1",
+]
+
+# Import them
+terraform import 'aws_route53_delegation_set.delegation_sets[""]' <DELEG-ID>
+terraform import 'aws_route53_delegation_set.delegation_sets["deleg1"]' <DELEG-ID>
+```
+
+### Zones
+```bash
+# Public root zone
+terraform import 'aws_route53_zone.public_root_zones["www.example.com"]' <ZONE-ID>
+
+# Private root zone
+terraform import 'aws_route53_zone.private_root_zones["private.example.com"]' <ZONE-ID>
+```
+
+
 ## Examples
 
 * [private-domains](examples/private-domains)
@@ -131,6 +183,7 @@ No requirements.
 | public\_root\_zones | Created public root zones. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
 
 ## Example output
 
@@ -228,9 +281,11 @@ public_delegated_secondary_zones = {
   }
 ```
 
+
 ## Authors
 
 Module managed by [cytopia](https://github.com/cytopia).
+
 
 ## License
 
