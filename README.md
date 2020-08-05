@@ -28,7 +28,7 @@ The only thing you need to choose, is the TTL (in seconds), of those NS records,
 
 ```hcl
 module "public_zone" {
-  source = "github.com/Flaconi/terraform-aws-route53-zone?ref=v1.0.0"
+  source = "github.com/cytopia/terraform-aws-route53-zone?ref=v1.0.0"
 
   # Create as many delegation sets by reference name as are required.
   delegation_sets = [
