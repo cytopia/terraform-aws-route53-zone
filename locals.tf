@@ -26,14 +26,14 @@ locals {
   #   "example2.tld" {
   #     "name" = "example2.tld"
   #     "deleg_id" = null
-  #     "deleg_name" = ""
+  #     "deleg_name" = null
   #   },
   # }
   public_root_zones = {
     for zone in var.public_root_zones : zone.name => {
       name       = zone.name
       deleg_id   = zone.delegation_set != null ? aws_route53_delegation_set.delegation_sets[zone.delegation_set]["id"] : null
-      deleg_name = zone.delegation_set != null ? zone.delegation_set : ""
+      deleg_name = zone.delegation_set
     }
   }
 }
