@@ -97,7 +97,7 @@ locals {
       name       = zone.name
       parent     = zone.parent
       deleg_id   = zone.delegation_set != null ? aws_route53_delegation_set.delegation_sets[zone.delegation_set]["id"] : null
-      deleg_name = zone.delegation_set != null ? zone.delegation_set : ""
+      deleg_name = zone.delegation_set
     }
   }
   public_delegated_secondary_ns_records = {
