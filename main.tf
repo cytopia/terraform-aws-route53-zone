@@ -60,7 +60,7 @@ resource "aws_route53_record" "public_delegated_secondary_ns_records" {
   name    = each.value.name
   type    = "NS"
   ttl     = each.value.ns_ttl
-  records = each.value.ns_list
+  records = formatlist("%s.", each.value.ns_list)
 
   depends_on = [aws_route53_zone.public_delegated_secondary_zones]
 }
