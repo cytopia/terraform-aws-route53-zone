@@ -142,6 +142,22 @@ terraform import 'aws_route53_zone.public_root_zones["www.example.com"]' <ZONE-I
 terraform import 'aws_route53_zone.private_root_zones["private.example.com"]' <ZONE-ID>
 ```
 
+### Secondary zones
+Secondary zones will create NS records in their parent zone. So in order to import them, you will
+first have to identify the currently existing NS record in the parent zone, import it
+and then import the secondary zone.
+```bash
+# List records in parent zone
+aws route53 list-resource-record-sets --hosted-zone-id <PARENT-ZONE-ID>
+
+# Import NS record (from parent zone)
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record#import
+terraform import 'aws_route53_record.public_delegated_secondary_ns_records["sub.www.example.com"]' <PARENT-ZONE-ID>_sub.www.example.com_NS
+
+# Import Sub zone
+terraform import 'aws_route53_zone.public_delegated_secondary_zones["sub.www.example.com"]' <ZONE-ID>
+```
+
 
 ## Examples
 
