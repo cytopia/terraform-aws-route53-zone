@@ -43,7 +43,7 @@ module "public_zone" {
   public_root_zones = [
     {
       name           = "example.com",
-      delegation_set = "root-zones",
+      delegation_set = "root-zone",
     },
     {
       name           = "example.org",
