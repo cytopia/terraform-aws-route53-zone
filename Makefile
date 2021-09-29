@@ -52,16 +52,6 @@ lint:
 	$(MAKE) --no-print-directory _lint-files
 	$(MAKE) --no-print-directory _lint-fmt
 
-	@if docker run -it --rm -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:light \
-		fmt -check=true -diff=true -write=false -list=true .; then \
-		echo "OK"; \
-	else \
-		echo "Failed"; \
-		exit 1; \
-	fi;
-	@echo
-
-
 test: _pull-tf
 	@$(foreach example,\
 		$(TF_EXAMPLES),\
@@ -161,7 +151,7 @@ _lint-fmt: _pull-tf
 	@echo "------------------------------------------------------------"
 	@echo "# *.tf files"
 	@echo "------------------------------------------------------------"
-	@if docker run -it --rm -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:$(TF_VERSION) \
+	@if docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:$(TF_VERSION) \
 		fmt -check=true -diff=true -write=false -list=true .; then \
 		echo "OK"; \
 	else \

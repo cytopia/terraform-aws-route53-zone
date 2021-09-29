@@ -178,7 +178,7 @@ terraform import 'aws_route53_zone.public_delegated_secondary_zones["sub.www.exa
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.60.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3 |
 
 ## Modules
 
