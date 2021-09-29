@@ -49,7 +49,7 @@ variable "private_root_zones" {
 # Optional Misc Variables
 # -------------------------------------------------------------------------------------------------
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   default     = {}
   description = "Default tags to additionally apply to all resources."
 }

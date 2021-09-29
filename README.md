@@ -10,9 +10,9 @@
 **[Outputs](#outputs)** |
 **[License](#license)**
 
-[![Build Status](https://travis-ci.org/cytopia/terraform-aws-route53-zone.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-route53-zone)
-[![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-route53-zone.svg)](https://github.com/cytopia/terraform-aws-route53-zone/releases)
-[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--route53--zone-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/route53-zone/aws/)
+![terraform workflow](https://github.com/flaconi/terraform-aws-route53-zone/actions/workflows/terraform.yml/badge.svg)
+![master workflow](https://github.com/flaconi/terraform-aws-route53-zone/actions/workflows/master.yml/badge.svg)
+[![Tag](https://img.shields.io/github/tag/Flaconi/terraform-aws-route53-zone.svg)](https://github.com/Flaconi/terraform-aws-route53-zone/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This Terraform module is able to create an arbitrary number of **delegation sets**, **public** and **private** hosted zones for root and delegated domains.
