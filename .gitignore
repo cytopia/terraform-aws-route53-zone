@@ -2,3 +2,6 @@
 terraform.tfstate
 *.tfstate*
 terraform.tfvars
+
+# Exclude the providers lock file introduced by TF0.14
+.terraform.lock.hcl
