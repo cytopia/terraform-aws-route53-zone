@@ -1,0 +1,43 @@
+---
+
+###
+### Runs checks on whole repository: lint, docs, test
+###
+
+name: terraform
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: "make lint"
+        run: |
+          make lint
+
+  docs:
+    runs-on: ubuntu-latest
+    name: "Terraform docs"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: "make gen"
+        run: |
+          make gen
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
+
+  test:
+    runs-on: ubuntu-latest
+    name: "Terraform test"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: "make test"
+        run: |
+          make test

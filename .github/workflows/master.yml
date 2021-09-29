@@ -1,0 +1,22 @@
+---
+
+###
+### Runs tests on master branch
+###
+
+name: "master branch"
+on:
+  schedule:
+   - cron: "0 4 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: "Terraform test"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: "make test"
+        run: |
+          make test
