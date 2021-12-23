@@ -69,9 +69,6 @@ resource "aws_route53_record" "public_delegated_secondary_ns_records" {
 # -------------------------------------------------------------------------------------------------
 # Private root zones
 # -------------------------------------------------------------------------------------------------
-data "aws_vpc" "default" {
-  default = true
-}
 data "aws_region" "current" {}
 
 resource "aws_route53_zone" "private_root_zones" {
@@ -81,7 +78,7 @@ resource "aws_route53_zone" "private_root_zones" {
   comment = var.comment
 
   dynamic "vpc" {
-    for_each = { for vpc in concat([{ "id" = data.aws_vpc.default.id, "region" = data.aws_region.current.name }], each.value.vpc_ids) : vpc.id => vpc }
+    for_each = { for vpc in each.value.vpc_ids : vpc.id => vpc }
     content {
       vpc_id     = vpc.value.id
       vpc_region = vpc.value.region
@@ -93,5 +90,5 @@ resource "aws_route53_zone" "private_root_zones" {
     var.tags
   )
 
-  depends_on = [data.aws_vpc.default, data.aws_region.current]
+  depends_on = [data.aws_region.current]
 }

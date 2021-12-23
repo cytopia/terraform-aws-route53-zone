@@ -10,7 +10,7 @@ TF_EXAMPLES = $(sort $(dir $(wildcard $(CURRENT_DIR)examples/*/)))
 # Image versions
 # -------------------------------------------------------------------------------------------------
 TF_VERSION      = 0.13.7
-TFDOCS_VERSION  = 0.15.0-0.29
+TFDOCS_VERSION  = 0.16.0-0.31
 FL_VERSION      = 0.4
 
 
