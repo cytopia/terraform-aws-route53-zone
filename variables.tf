@@ -28,6 +28,18 @@ variable "public_delegated_secondary_zones" {
   description = "A list of public Route53 delegated secondary zones. Each item must specify its 'parent' by name, which must match the name defined in the 'public_root_zones' variables and must also be exactly one level deeper than the corresponding root zone item. By doing so, this module will automatically add nameservers into the root zone to create the delegation. You can also attach a delegation_set to this zone by its reference name (if it has been defined in the 'delegation_sets' list) or set it to 'null' to use no delegation set. Additionally you can also define your own name servers for this zone by specifying them in the `ns_list` list or just leave the list empty to use AWS default name server."
 }
 
+variable "public_delegated_tertiary_zones" {
+  type = list(object({
+    name           = string,
+    parent         = string,
+    ns_ttl         = number,
+    ns_list        = list(string),
+    delegation_set = string,
+  }))
+  default     = []
+  description = "A list of public Route53 delegated tertiary zones. Each item must specify its 'parent' by name, which must match the name defined in the 'public_delegated_secondary_zones' variables and must also be exactly one level deeper than the corresponding root zone item. By doing so, this module will automatically add nameservers into the root zone to create the delegation. You can also attach a delegation_set to this zone by its reference name (if it has been defined in the 'delegation_sets' list) or set it to 'null' to use no delegation set. Additionally you can also define your own name servers for this zone by specifying them in the `ns_list` list or just leave the list empty to use AWS default name server."
+}
+
 
 # -------------------------------------------------------------------------------------------------
 # Optional Private Zone Variables

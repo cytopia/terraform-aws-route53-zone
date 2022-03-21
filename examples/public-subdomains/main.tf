@@ -42,4 +42,14 @@ module "aws_route53zone" {
       delegation_set = null,
     },
   ]
+
+  public_delegated_tertiary_zones = [
+    {
+      name           = "app.internal.example.org",
+      parent         = "internal.example.org",
+      ns_ttl         = 30,
+      ns_list        = [],
+      delegation_set = null,
+    },
+  ]
 }

@@ -1,7 +1,3 @@
-#
-# Note: local_* values are for debugging purposes
-#
-
 # -------------------------------------------------------------------------------------------------
 # Route53 Delegation Sets
 # -------------------------------------------------------------------------------------------------
@@ -14,10 +10,6 @@ output "delegation_sets" {
 # -------------------------------------------------------------------------------------------------
 # Public Route53 Root Zones
 # -------------------------------------------------------------------------------------------------
-#output "local_public_root_zones" {
-#  value       = local.public_root_zones
-#  description = "Transformed public root zones."
-#}
 
 output "public_root_zones" {
   value       = aws_route53_zone.public_root_zones
@@ -28,15 +20,6 @@ output "public_root_zones" {
 # -------------------------------------------------------------------------------------------------
 # Public Route53 Subdomain Zones (secondary)
 # -------------------------------------------------------------------------------------------------
-#output "local_public_delegated_secondary_zones" {
-#  value       = local.public_delegated_secondary_zones
-#  description = "Transformed public secondary zones."
-#}
-
-#output "local_public_delegated_secondary_ns_records" {
-#  value       = local.public_delegated_secondary_ns_records
-#  description = "Transformed public secondary ns records."
-#}
 
 output "public_delegated_secondary_zones" {
   value       = aws_route53_zone.public_delegated_secondary_zones
@@ -50,12 +33,23 @@ output "public_delegated_secondary_ns_records" {
 
 
 # -------------------------------------------------------------------------------------------------
+# Public Route53 Subdomain Zones (tertiary)
+# -------------------------------------------------------------------------------------------------
+
+output "public_delegated_tertiary_zones" {
+  value       = aws_route53_zone.public_delegated_secondary_zones
+  description = "Created public delegated tertiary zones."
+}
+
+output "public_delegated_tertiary_ns_records" {
+  value       = aws_route53_record.public_delegated_secondary_ns_records
+  description = "Created NS records in your root zone for delegated tertiary zones."
+}
+
+
+# -------------------------------------------------------------------------------------------------
 # Private Route53 Root Zones
 # -------------------------------------------------------------------------------------------------
-#output "local_private_root_zones" {
-#  value       = local.private_root_zones
-#  description = "Transformed private root zones."
-#}
 
 output "private_root_zones" {
   value       = aws_route53_zone.private_root_zones
